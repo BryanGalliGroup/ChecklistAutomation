@@ -7,7 +7,6 @@ from email.message import EmailMessage
 from dotenv import load_dotenv
 from google import genai
 
-
 def get_today_commits(repo_path: str) -> str:
     today = datetime.now().strftime("%Y-%m-%d")
 
@@ -31,7 +30,6 @@ def get_today_commits(repo_path: str) -> str:
 
     return result.stdout.strip()
 
-
 def generate_summary(commits: str) -> str:
     client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
@@ -51,13 +49,33 @@ Commits do dia:
 
     return response.text or ""
 
-
 def send_email(body: str) -> None:
     msg = EmailMessage()
+
+    subject = os.getenv(
+        "EMAIL_SUBJECT",
+        "Checklist de Atividades | [DAY]"
+    ).replace("[DAY]", datetime.now().strftime("%d/%m"))
+
+    email_body = f"""
+{body}
+
+============================================================================================
+                                                                    Automação de Checklist
+============================================================================================
+
+Este é o resumo das atividades realizadas hoje, gerado automaticamente a partir das alterações realizadas no projeto.
+
+O objetivo é fornecer uma visão clara e concisa das mudanças, melhorias e correções implementadas, facilitando o 
+acompanhamento do progresso e o entendimento dos impactos positivos das alterações realizadas.
+
+============================================================================================
+""".strip()
+
     msg["From"] = os.getenv("EMAIL_FROM")
     msg["To"] = os.getenv("EMAIL_TO")
-    msg["Subject"] = os.getenv("EMAIL_SUBJECT", "Checklist de Atividades | [DAY]").replace("[DAY]", datetime.now().strftime("%d/%m"))
-    msg.set_content(body)
+    msg["Subject"] = subject
+    msg.set_content(email_body)
 
     smtp_host = os.getenv("SMTP_HOST")
     smtp_port = int(os.getenv("SMTP_PORT", "587"))
@@ -68,7 +86,6 @@ def send_email(body: str) -> None:
         server.starttls()
         server.login(smtp_user, smtp_password)
         server.send_message(msg)
-
 
 def main():
     load_dotenv()
@@ -84,7 +101,6 @@ def main():
     send_email(summary)
 
     print("Resumo enviado por e-mail com sucesso.")
-
 
 if __name__ == "__main__":
     main()
