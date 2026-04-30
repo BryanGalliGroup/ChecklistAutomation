@@ -3,76 +3,9 @@ import os
 import smtplib
 from datetime import datetime
 from email.message import EmailMessage
-from html import escape
 from pathlib import Path
-
-
-def build_plain_body(body: str, signature: str) -> str:
-    return f"""
-{body}
-
-============================================================================================
-                                                                    Automação de Checklist
-============================================================================================
-
-Este é o resumo das atividades realizadas hoje, gerado automaticamente a partir das alterações realizadas no projeto.
-
-O objetivo é fornecer uma visão clara e concisa das mudanças, melhorias e correções implementadas, facilitando o 
-acompanhamento do progresso e o entendimento dos impactos positivos das alterações realizadas.
-
-============================================================================================
-
-{signature}
-""".strip()
-
-
-def build_email_html(body: str, signature: str, image_url: str | None) -> str:
-    image_html = ""
-
-    if image_url:
-        image_html = f"""
-        <div style="text-align: flex-start; margin: 24px 0;">
-            <img 
-                src="{escape(image_url)}" 
-                alt="Imagem do checklist" 
-                style="max-width: 600px; width: 45%; height: auto;"
-            />
-        </div>
-        """
-
-    return f"""
-    <html>
-        <body style="font-family: Arial, sans-serif; color: #222; line-height: 1.6;">
-            <div style="white-space: pre-line;">
-                {escape(body)}
-            </div>
-
-            <hr style="margin: 32px 0;" />
-
-            <h3 style="text-align: center;">
-                Automação de Checklist
-            </h3>
-
-            <p>
-                Este é o resumo das atividades realizadas hoje, gerado automaticamente a partir das alterações realizadas no projeto.
-            </p>
-
-            <p>
-                O objetivo é fornecer uma visão clara e concisa das mudanças, melhorias e correções implementadas,
-                facilitando o acompanhamento do progresso e o entendimento dos impactos positivos das alterações realizadas.
-            </p>
-
-            <hr style="margin: 32px 0;" />
-
-            {image_html}
-
-            <div style="white-space: pre-line; color: #8c8c8c; font-size: 0.9em;">
-                {escape(signature)}
-            </div>
-        </body>
-    </html>
-    """.strip()
-
+from src.build_html import build_email_html
+from src.build_plain import build_plain_body
 
 def send_email(body: str) -> None:
     msg = EmailMessage()
