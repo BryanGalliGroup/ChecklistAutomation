@@ -28,7 +28,7 @@ def build_email_html(body: str, signature: str, image_url: str | None) -> str:
             </h3>
 
             <p>
-                Este é o resumo das atividades realizadas hoje, gerado automaticamente a partir das alterações realizadas no projeto.
+                Este é o resumo das atividades realizadas hoje, <b>gerado automaticamente a partir das alterações realizadas no projeto.</b>
             </p>
 
             <p>
@@ -37,8 +37,8 @@ def build_email_html(body: str, signature: str, image_url: str | None) -> str:
             </p>
 
             <p>
-                O resumo é gerado a partir dos commits(alterações no código) realizados no dia, utilizando inteligência artificial para sintetizar as informações de forma clara e objetiva.
-                A inteligência artificial pode cometer erros ou interpretar de forma incorreta as informações, portanto, caso tenha dúvidas ou queira mais detalhes sobre alguma atividade, sinta-se à vontade para entrar em contato.
+                O resumo é gerado a partir dos <b>commits(alterações no código)</b> realizados no dia, utilizando <b>inteligência artificial</b> para sintetizar as informações de forma clara e objetiva.
+                <b>A inteligência artificial pode cometer erros ou interpretar de forma incorreta as informações</b>, portanto, caso tenha dúvidas ou queira mais detalhes sobre alguma atividade, sinta-se à vontade para entrar em contato.
             </p>
 
             <hr style="margin: 32px 0;" />

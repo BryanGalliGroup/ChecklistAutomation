@@ -2,6 +2,9 @@ import os
 import sys
 import time
 import threading
+import subprocess
+import tempfile
+from pathlib import Path
 from itertools import cycle
 from typing import Callable, TypeVar
 
@@ -44,6 +47,58 @@ def run_with_loading(
         thread.join()
 
 
+def create_temp_summary_file(summary: str) -> Path:
+    file_descriptor, file_path = tempfile.mkstemp(
+        prefix="commit_summary_",
+        suffix=".txt",
+        text=True,
+    )
+
+    path = Path(file_path)
+
+    with os.fdopen(file_descriptor, "w", encoding="utf-8") as file:
+        file.write(summary)
+
+        if not summary.endswith("\n"):
+            file.write("\n")
+
+    return path
+
+
+def open_notepad_and_wait(file_path: Path) -> None:
+    if os.name != "nt":
+        raise RuntimeError("Este fluxo foi configurado para abrir o Bloco de Notas no Windows.")
+
+    subprocess.run(
+        ["notepad.exe", str(file_path)],
+        check=True,
+    )
+
+
+def read_summary_file(file_path: Path) -> str:
+    return file_path.read_text(encoding="utf-8").strip()
+
+
+def delete_temp_file(file_path: Path) -> None:
+    try:
+        file_path.unlink(missing_ok=True)
+    except OSError as error:
+        print(f"Não foi possível apagar o arquivo temporário: {error}")
+
+
+def ask_send_by_email() -> bool:
+    while True:
+        answer = input("Enviar resumo por e-mail? (y/n): ").strip().lower()
+
+        if answer in {"y", "yes", "s", "sim"}:
+            return True
+
+        if answer in {"n", "no", "nao", "não"}:
+            return False
+
+        print("Opção inválida. Digite y para enviar ou n para cancelar.")
+
+
 def main() -> None:
     load_dotenv()
 
@@ -67,15 +122,40 @@ def main() -> None:
         commits,
     )
 
-    print(f"Resumo gerado:\n{summary}\n")
+    temp_summary_file: Path | None = None
 
-    run_with_loading(
-        "Enviando resumo por e-mail...",
-        send_email,
-        summary,
-    )
+    try:
+        temp_summary_file = create_temp_summary_file(summary)
 
-    print("Resumo enviado por e-mail com sucesso.")
+        print("Resumo salvo em arquivo temporário.")
+        print(f"Arquivo: {temp_summary_file}")
+        print("O Bloco de Notas será aberto.")
+        print("Edite o resumo, salve o arquivo e feche o Bloco de Notas para continuar.\n")
+
+        open_notepad_and_wait(temp_summary_file)
+
+        edited_summary = read_summary_file(temp_summary_file)
+
+        if not edited_summary:
+            print("O resumo ficou vazio. Nenhum e-mail será enviado.")
+            return
+
+        should_send_email = ask_send_by_email()
+
+        if should_send_email:
+            run_with_loading(
+                "Enviando resumo por e-mail...",
+                send_email,
+                edited_summary,
+            )
+
+            print("Resumo enviado por e-mail com sucesso.")
+        else:
+            print("Envio cancelado.")
+
+    finally:
+        if temp_summary_file is not None:
+            delete_temp_file(temp_summary_file)
 
 
 if __name__ == "__main__":
