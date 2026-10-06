@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+
+Name=Automação de Checklist
+Comment=Automação de resumo de commits
+
+Exec=/bin/bash /config/the/path/script.sh
+Path=/config/the/path
+
+Terminal=false
+Icon=/config/the/path/icon.png
+
+Categories=Development;
+StartupNotify=true
