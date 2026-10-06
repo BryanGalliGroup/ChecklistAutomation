@@ -1,0 +1,9 @@
+{
+  "projects": [
+    {
+      "key": "PRJT1",
+      "name": "Update with your's projects details",
+      "path": "/update/path"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "ai": {
+    "model": "gemini-2.5-flash",
+    "prompt": ""
+  },
+  "email": {
+    "subject": "",
+    "from_name": "",
+    "to": [
+      ""
+    ],
+    "signature": "",
+    "image_url": ""
+  },
+  "editor": {
+    "command": "code"
+  }
+}
